@@ -35,6 +35,8 @@ function WrappingBackground:initialize()
         /* for some arcane reason this epsilon is necessary */
         const float EPSILON = 0.001;
 
+        uniform float tint;
+
         uniform Image wrapIm;
         uniform vec2 canvasDims;
         uniform vec2 offset;
@@ -55,7 +57,7 @@ function WrappingBackground:initialize()
             uv = uv-0.5;
             vec4 texturecolor = Texel(wrapIm, uv);
             vec4 rb = vec4(hsv2rgb(vec3(ceil(20*(uv.x+uv.y-0.15))/20,1,1)),1.0);
-            return mix(texturecolor, rb, 0) * color;
+            return mix(texturecolor, rb, 0) * color * vec4(tint,tint,tint,1.0);
         }
     ]])
     self.shader:send("wrapIm", self.canvas)
@@ -63,6 +65,7 @@ function WrappingBackground:initialize()
     self.shader:send("offset", { 0, 0 })
     self.shader:send("currentOffset", { 0, 0 })
     self.shader:send("zoom", 1)
+    self.shader:send("tint", 0.5)
 end
 
 function WrappingBackground:screenToCanvasCoords(sx, sy)

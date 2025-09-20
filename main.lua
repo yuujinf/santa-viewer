@@ -12,7 +12,7 @@ local state = {
 
     bg = WB:new({ filename = "assets/testIm.png" }),
 
-    viewer = IV:new({ filename = "assets/testIm.png" }),
+    viewer = IV:new({ filename = "assets/testIm2.png" }),
 }
 
 function love.load()
@@ -29,9 +29,7 @@ function state:rebuildLayout()
             childGap = 10,
         },
         function()
-            b:with(Layout.newItem { sizing = { width = 300 } })
-            self.viewer:rebuildLayout(b)
-            b:with(Layout.newItem { sizing = { width = 300 } })
+            -- self.viewer:rebuildLayout(b)
         end)
 
     self.layout:rebuildLayout()
@@ -39,26 +37,30 @@ end
 
 function love.mousemoved(x, y, dx, dy, istouch)
     -- state.scene:mousemoved(x, y, dx, dy, istouch)
-    state.bg:mousemoved(x, y, dx, dy, istouch)
+    -- state.bg:mousemoved(x, y, dx, dy, istouch)
+    state.viewer:mousemoved(x, y, dx, dy, istouch)
 end
 
 function love.mousepressed(x, y, button, istouch, presses)
     -- state.scene:mousepressed(x, y, button, istouch, presses)
-    state.bg:mousepressed(x, y, button, istouch, presses)
+    -- state.bg:mousepressed(x, y, button, istouch, presses)
+    state.viewer:mousepressed(x, y, button, istouch, presses)
 end
 
 function love.mousereleased(x, y, button, istouch, presses)
     -- state.scene:mousereleased(x, y, button, istouch, presses)
-    state.bg:mousereleased(x, y, button, istouch, presses)
+    -- state.bg:mousereleased(x, y, button, istouch, presses)
+    state.viewer:mousereleased(x, y, button, istouch, presses)
 end
 
 function love.keypressed(key, scancode, isrepeat)
     -- state.scene:keypressed(key, scancode, isrepeat)
-    state.bg:keypressed(key, scancode, isrepeat)
+    -- state.bg:keypressed(key, scancode, isrepeat)
 end
 
 function love.wheelmoved(dx, dy)
-    state.bg:wheelmoved(dx, dy)
+    -- state.bg:wheelmoved(dx, dy)
+    state.viewer:wheelmoved(dx, dy)
 end
 
 function love.update(dt)
@@ -67,5 +69,6 @@ end
 
 function love.draw()
     state.bg:draw()
+    state.viewer:draw()
     state.layout:draw()
 end
