@@ -160,7 +160,7 @@ function WrappingBackground:draw()
     love.graphics.setColor(1, 1, 1)
     love.graphics.setLineWidth(1)
     love.graphics.draw(self.image, 0, 0)
-    love.graphics.rectangle("line", 0, 0, self.canvas:getDimensions())
+    -- love.graphics.rectangle("line", 0, 0, self.canvas:getDimensions())
     if self.arrowSrc then
         for dx = -1, 1 do
             for dy = -1, 1 do

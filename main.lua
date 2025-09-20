@@ -65,6 +65,11 @@ end
 
 function love.update(dt)
     -- state.scene:update(dt)
+    state.bg.offsetX = state.bg.offsetX - 48 * dt
+    state.bg.offsetY = state.bg.offsetY + 24 * dt
+
+    state.bg.offsetX = math.fmod(state.bg.offsetX, state.bg.canvas:getWidth())
+    state.bg.offsetY = math.fmod(state.bg.offsetY, state.bg.canvas:getHeight())
 end
 
 function love.draw()
