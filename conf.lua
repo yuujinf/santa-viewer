@@ -2,7 +2,7 @@ function love.conf(t)
     t.window.title = "Santa Viewer"
     -- t.window.fullscreen = true
 
-    t.identity = "Santa Viewer"
+    t.identity = "SantaViewer"
 
     t.window.width = 1600
     t.window.height = 960

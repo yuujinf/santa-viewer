@@ -185,17 +185,6 @@ function WrappingBackground:draw()
     love.graphics.setShader(self.shader)
     love.graphics.rectangle("fill", 0, 0, love.graphics.getDimensions())
     love.graphics.setShader()
-
-    love.graphics.push()
-    love.graphics.setColor(0, 0, 0)
-    love.graphics.rectangle("fill", 0, 0, 200, 50)
-    love.graphics.setColor(1, 1, 1)
-    love.graphics.print(string.format("offset %d %d", self.offsetX, self.offsetY))
-    love.graphics.translate(0, 20)
-
-    local px, py = self:screenToCanvasCoords(love.mouse.getPosition())
-    love.graphics.print(string.format("mouse %d %d", px, py))
-    love.graphics.pop()
 end
 
 return WrappingBackground

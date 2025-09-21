@@ -4,15 +4,16 @@ local Menu = require("menu")
 
 local WB = require("wrappingbackground")
 local IV = require("imageviewer")
+local P = require("presenter")
 
 love.graphics.setDefaultFilter("nearest", "nearest")
 
 local state = {
     scene = nil,
 
-    bg = WB:new({ filename = "assets/testIm.png" }),
+    bg = WB:new({ filename = "assets/testBg.png" }),
 
-    viewer = IV:new({ filename = "assets/testIm2.png" }),
+    presenter = P:new({ projectName = "santa24" })
 }
 
 function love.load()
@@ -38,29 +39,30 @@ end
 function love.mousemoved(x, y, dx, dy, istouch)
     -- state.scene:mousemoved(x, y, dx, dy, istouch)
     -- state.bg:mousemoved(x, y, dx, dy, istouch)
-    state.viewer:mousemoved(x, y, dx, dy, istouch)
+    state.presenter:mousemoved(x, y, dx, dy, istouch)
 end
 
 function love.mousepressed(x, y, button, istouch, presses)
     -- state.scene:mousepressed(x, y, button, istouch, presses)
     -- state.bg:mousepressed(x, y, button, istouch, presses)
-    state.viewer:mousepressed(x, y, button, istouch, presses)
+    state.presenter:mousepressed(x, y, button, istouch, presses)
 end
 
 function love.mousereleased(x, y, button, istouch, presses)
     -- state.scene:mousereleased(x, y, button, istouch, presses)
     -- state.bg:mousereleased(x, y, button, istouch, presses)
-    state.viewer:mousereleased(x, y, button, istouch, presses)
+    state.presenter:mousereleased(x, y, button, istouch, presses)
 end
 
 function love.keypressed(key, scancode, isrepeat)
     -- state.scene:keypressed(key, scancode, isrepeat)
     -- state.bg:keypressed(key, scancode, isrepeat)
+    state.presenter:keypressed(key, scancode, isrepeat)
 end
 
 function love.wheelmoved(dx, dy)
     -- state.bg:wheelmoved(dx, dy)
-    state.viewer:wheelmoved(dx, dy)
+    state.presenter:wheelmoved(dx, dy)
 end
 
 function love.update(dt)
@@ -70,10 +72,12 @@ function love.update(dt)
 
     state.bg.offsetX = math.fmod(state.bg.offsetX, state.bg.canvas:getWidth())
     state.bg.offsetY = math.fmod(state.bg.offsetY, state.bg.canvas:getHeight())
+
+    state.presenter:update(dt)
 end
 
 function love.draw()
     state.bg:draw()
-    state.viewer:draw()
+    state.presenter:draw()
     state.layout:draw()
 end
