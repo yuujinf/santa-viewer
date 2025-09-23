@@ -85,16 +85,6 @@ function Presenter:keypressed(key, scancode, isrepeat)
 end
 
 function Presenter:update(dt)
-    self.count = self.count + 1
-    local dirty
-    while self.count > 20 do
-        self:nextSubmission()
-        self.count = self.count - 15
-        dirty = true
-    end
-    if dirty then
-        self:updateImageViewer()
-    end
 end
 
 function Presenter:draw()
