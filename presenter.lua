@@ -34,8 +34,8 @@ function Presenter:initialize()
     self.currentItem = 1
 
     self.count = 0
-
     self.scroll = 0
+    self.leftPanelVisible = true
 
     self:updateImageViewer()
 
@@ -57,9 +57,10 @@ function Presenter:rebuildLayout()
                     width = Layout.percentSizing(0.2),
                     height = "grow",
                 },
-                backgroundColor = { 0, 0, 0, 0.1 },
                 drawer = function(l)
-                    self:drawLeftPanel(l.rect)
+                    if self.leftPanelVisible then
+                        self:drawLeftPanel(l.rect)
+                    end
                 end
             })
         end)
@@ -82,10 +83,17 @@ function Presenter:nextSubmission()
     if self.currentItem <= self.presentation:numberOfItems(self.currentSub) then return end
 
     self.currentItem = 1
+
     self.currentSub = self.currentSub + 1
     if self.currentSub <= self.presentation:numberOfSubmissions() then return end
 
     self.currentSub = 1
+
+    local newScroll = (self.leftPanelRect.height - presenterFont:getHeight()) / 2
+        - presenterFont:getHeight() * (self.currentSub - 1)
+
+    self.scroll = newScroll / (self.leftPanelRect.h - 10 - #self.presentation.participants * presenterFont:getHeight())
+    self.scroll = math.max(0, math.min(1, self.scroll))
 end
 
 function Presenter:prevSubmission()
@@ -104,9 +112,34 @@ end
 
 function Presenter:mousemoved(x, y, dx, dy, istouch)
     self.imageViewer:mousemoved(x, y, dx, dy, istouch)
+
+    if self.leftPanelVisible then
+        local rx, ry = x - (self.leftPanelRect.x + 5),
+            y - (self.leftPanelRect.y + 5) -
+            (self.scroll * (self.leftPanelRect.h - 10 - #self.presentation.participants * presenterFont:getHeight()))
+        print(rx, math.floor(ry / presenterFont:getHeight()) + 1)
+
+        if rx >= 0 and rx <= self.leftPanelRect.w then
+            self.hover = math.floor(ry / presenterFont:getHeight()) + 1
+        else
+            self.hover = nil
+        end
+    end
 end
 
 function Presenter:mousepressed(x, y, button, istouch, presses)
+    if self.hover and self.leftPanelVisible then
+        self.currentSub = self.hover
+        self.currentItem = 1
+
+        local newScroll = (self.leftPanelRect.h - presenterFont:getHeight()) / 2
+            - presenterFont:getHeight() * (self.currentSub - 1)
+
+        self.scroll = newScroll /
+            (self.leftPanelRect.h - 10 - #self.presentation.participants * presenterFont:getHeight())
+        self.scroll = math.max(0, math.min(1, self.scroll))
+        self:updateImageViewer()
+    end
     self.imageViewer:mousepressed(x, y, button, istouch, presses)
 end
 
@@ -120,8 +153,14 @@ function Presenter:wheelmoved(dx, dy)
         return
     end
 
-    self.scroll = math.max(0, math.min(1, self.scroll + -0.01 * dy))
+    self.scroll = math.max(0, math.min(1, self.scroll + -0.05 * dy))
     print(self.scroll)
+end
+
+function Presenter:scrollItemPosition(i)
+    local y = self.scroll * (self.leftPanelRect.h - 10 - #self.presentation.participants * presenterFont:getHeight())
+    y = y + (i - 1) * presenterFont:getHeight()
+    return y
 end
 
 function Presenter:keypressed(key, scancode, isrepeat)
@@ -133,6 +172,8 @@ function Presenter:keypressed(key, scancode, isrepeat)
         self:updateImageViewer()
     elseif scancode == "0" then
         self.imageViewer:zoomToFit()
+    elseif key == "tab" then
+        self.leftPanelVisible = not self.leftPanelVisible
     end
 end
 
@@ -153,6 +194,8 @@ end
 
 function Presenter:drawLeftPanel(rect)
     love.graphics.push("all")
+    love.graphics.setColor(0, 0, 0, 0.25)
+    love.graphics.rectangle("fill", rect.x, rect.y, rect.w, rect.h)
     love.graphics.translate(5, 5)
     love.graphics.setScissor(15, 15, rect.w - 10, rect.h - 10)
     love.graphics.setFont(presenterFont)
@@ -160,11 +203,19 @@ function Presenter:drawLeftPanel(rect)
     love.graphics.translate(0,
         self.scroll * (rect.h - 10 - #self.presentation.participants * presenterFont:getHeight()))
     for i, rc in ipairs(self.presentation.participants) do
+        if i == self.currentSub then
+            love.graphics.setColor(0.5, 0.5, 1, 0.50)
+            love.graphics.rectangle("fill", 0, 0, rect.w - 10, presenterFont:getHeight())
+        elseif i == self.hover then
+            love.graphics.setColor(1, 1, 1, 0.50)
+            love.graphics.rectangle("fill", 0, 0, rect.w - 10, presenterFont:getHeight())
+        end
         local name = rc
         local sp = self.theme.spec.participants[rc]
         if sp and sp.fancyName ~= "" then
             name = self.theme.spec.participants[name].fancyName
         end
+        love.graphics.setColor(1, 1, 1)
         love.graphics.print(name)
         love.graphics.translate(0, presenterFont:getHeight())
     end
