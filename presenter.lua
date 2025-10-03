@@ -116,6 +116,7 @@ end
 
 function Presenter:wheelmoved(dx, dy)
     if not self.leftPanelRect:contains({ love.mouse.getPosition() }) or dy == 0 then
+        self.imageViewer:wheelmoved(dx, dy)
         return
     end
 
@@ -130,6 +131,8 @@ function Presenter:keypressed(key, scancode, isrepeat)
     elseif key == "left" then
         self:prevSubmission()
         self:updateImageViewer()
+    elseif scancode == "0" then
+        self.imageViewer:zoomToFit()
     end
 end
 
