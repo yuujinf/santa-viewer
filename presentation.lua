@@ -18,27 +18,23 @@ function Presentation:loadPresentation(pn)
     local path = "projects/" .. pn
 
     self.submissions = {}
+    self.participants = {}
 
-    -- TODO: construct a logical object to traverse this directory structure
     local directories = love.filesystem.getDirectoryItems(path)
     table.sort(directories)
     for i, f in ipairs(directories) do
         local sub = {}
         sub.recipient = string.gsub(f, "%d+-", "")
-        print("recipient", sub.recipient)
         local subDirs = { "" }
         sub.items = {}
         while #subDirs > 0 do
             local d = table.remove(subDirs, 1)
-            print(path .. "/" .. f .. d)
             local entries = love.filesystem.getDirectoryItems(path .. "/" .. f .. d)
             table.sort(entries)
 
             for j, e in ipairs(entries) do
                 local info = love.filesystem.getInfo(path .. "/" .. f .. d .. "/" .. e)
-                print("searching", path .. "/" .. f .. d .. "/" .. e)
                 if info.type == "directory" then
-                    print("directory!")
                     -- table.insert(subDirs, d .. "/" .. e)
                 else
                     if d == "" then
@@ -47,7 +43,6 @@ function Presentation:loadPresentation(pn)
                             error("Submission with multiple senders")
                         end
                         sub.sender = sender
-                        print("sender", sub.sender)
                     end
                     table.insert(sub.items, {
                         path = path .. "/" .. f .. d .. "/" .. e
@@ -55,7 +50,10 @@ function Presentation:loadPresentation(pn)
                 end
             end
         end
+
+        print(string.format("%s > %s", sub.sender or "NIL", sub.recipient))
         table.insert(self.submissions, sub)
+        table.insert(self.participants, sub.recipient)
     end
 end
 

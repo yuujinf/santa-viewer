@@ -11,9 +11,7 @@ love.graphics.setDefaultFilter("nearest", "nearest")
 local state = {
     scene = nil,
 
-    bg = WB:new({ filename = "assets/testBg.png" }),
-
-    presenter = P:new({ projectName = "santa24" })
+    presenter = P:new({ projectName = "santa24", themeName = "defaultTheme" })
 }
 
 function love.load()
@@ -67,17 +65,10 @@ end
 
 function love.update(dt)
     -- state.scene:update(dt)
-    state.bg.offsetX = state.bg.offsetX - 48 * dt
-    state.bg.offsetY = state.bg.offsetY + 24 * dt
-
-    state.bg.offsetX = math.fmod(state.bg.offsetX, state.bg.canvas:getWidth())
-    state.bg.offsetY = math.fmod(state.bg.offsetY, state.bg.canvas:getHeight())
 
     state.presenter:update(dt)
 end
 
 function love.draw()
-    state.bg:draw()
     state.presenter:draw()
-    state.layout:draw()
 end
