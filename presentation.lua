@@ -19,6 +19,9 @@ function Presentation:loadPresentation(pn)
 
     self.submissions = {}
     self.participants = {}
+    -- Maps senders to their corresponding submission
+    self.sendMap = {}
+    self.recvMap = {}
 
     local directories = love.filesystem.getDirectoryItems(path)
     table.sort(directories)
@@ -54,6 +57,8 @@ function Presentation:loadPresentation(pn)
         print(string.format("%s > %s", sub.sender or "NIL", sub.recipient))
         table.insert(self.submissions, sub)
         table.insert(self.participants, sub.recipient)
+        self.sendMap[sub.sender] = sub
+        self.recvMap[sub.recipient] = sub
     end
 end
 
@@ -71,6 +76,14 @@ end
 
 function Presentation:numberOfItems(subIdx)
     return #self.submissions[subIdx].items
+end
+
+function Presentation:findSubBySender(sender)
+    return self.sendMap[sender]
+end
+
+function Presentation:findSubByRecipient(recv)
+    return self.recvMap[recv]
 end
 
 return Presentation

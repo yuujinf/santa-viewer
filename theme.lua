@@ -33,6 +33,7 @@ function Theme:loadTheme(name)
 
     local data = love.filesystem.read(path .. "/" .. "spec.json")
     self.spec = json.decode(data)
+    print(self.spec.bgMode)
 end
 
 function Theme.load(name)

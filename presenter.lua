@@ -1,4 +1,5 @@
 local Layout = require("lib.layout")
+local colorFromHex = require("lib.colorFromHex")
 
 local Presentation = require("presentation")
 local ImageViewer = require("imageviewer")
@@ -11,6 +12,9 @@ local presenterFont = love.graphics.newFont(24)
 
 local senderFontA = love.graphics.newFont(24)
 local senderFontB = love.graphics.newFont(48)
+
+local sentColor = colorFromHex("648fff")
+local recvColor = colorFromHex("dc267f")
 
 function Presenter:new(o)
     o = o or {}
@@ -27,9 +31,15 @@ function Presenter:initialize()
     self.theme = self.theme or (self.themeName and Theme.load(self.themeName)) or Theme.nullTheme
 
     if self.theme.bg then
-        self.bg = WB:new({ image = self.theme.bg })
+        self.bg = WB:new({
+            image = self.theme.bg,
+            mode = self.theme.spec.bgMode,
+        })
     else
-        self.bg = WB:new({ filename = "assets/testBg.png" })
+        self.bg = WB:new({
+            filename = "assets/testBg.png",
+            mode = self.theme.spec.bgMode,
+        })
     end
 
     self.currentSub = 1
@@ -78,7 +88,7 @@ function Presenter:updateImageViewer()
     local mediaFilename = self.presentation.submissions[self.currentSub].items[self.currentItem].path
     self.imageViewer:setImage(mediaFilename)
     self.imageViewer:zoomToFit()
-    if not self.presentedState[self.currentSub] then
+    if not self.presentedState[self.presentation.submissions[self.currentSub].recipient] then
         self.imageViewer.hide = true
     else
         self.imageViewer.hide = false
@@ -90,9 +100,8 @@ function Presenter:next()
     if self.currentItem <= self.presentation:numberOfItems(self.currentSub) then return end
 
     self.currentItem = 1
-
     local s = self.currentSub + 1
-    if s >= self.presentation:numberOfSubmissions() then self.currentSub = 1 end
+    if s >= self.presentation:numberOfSubmissions() then s = 1 end
     self:setSubmission(s)
 end
 
@@ -100,11 +109,10 @@ function Presenter:prev()
     self.currentItem = self.currentItem - 1
     if self.currentItem >= 1 then return end
 
-    self.currentSub = self.currentSub - 1
-    self.currentItem = self.presentation:numberOfItems(self.currentSub)
     local s = self.currentSub - 1
-    if s <= 1 then self.currentSub = self.presentation:numberOfSubmissions() end
+    if s <= 1 then s = self.presentation:numberOfSubmissions() end
     self:setSubmission(s)
+    self.currentItem = self.presentation:numberOfItems(self.currentSub)
 end
 
 function Presenter:setSubmission(i)
@@ -162,10 +170,11 @@ function Presenter:scrollItemPosition(i)
 end
 
 function Presenter:keypressed(key, scancode, isrepeat)
+    local rc = self.presentation.submissions[self.currentSub].recipient
     if key == "right" then
-        if not self.presentedState[self.currentSub] then
+        if not self.presentedState[rc] then
             self.imageViewer.hide = false
-            self.presentedState[self.currentSub] = {
+            self.presentedState[rc] = {
                 image = true,
             }
         else
@@ -174,22 +183,22 @@ function Presenter:keypressed(key, scancode, isrepeat)
         self:updateImageViewer()
     elseif key == "space" then
         self.imageViewer.hide = false
-        if not self.presentedState[self.currentSub] then
-            self.presentedState[self.currentSub] = {
+        if not self.presentedState[rc] then
+            self.presentedState[rc] = {
                 image = true,
             }
-        elseif not self.presentedState[self.currentSub].recipient then
-            self.presentedState[self.currentSub].recipient = true
-        elseif not self.presentedState[self.currentSub].sender then
-            self.presentedState[self.currentSub].sender = true
+        elseif not self.presentedState[rc].recipient then
+            self.presentedState[rc].recipient = true
+        elseif not self.presentedState[rc].sender then
+            self.presentedState[rc].sender = true
         end
-    elseif scancode == "1" and self.presentedState[self.currentSub] then
-        self.presentedState[self.currentSub].recipient = true
-    elseif scancode == "2" and self.presentedState[self.currentSub] then
-        self.presentedState[self.currentSub].sender = true
-    elseif scancode == "3" and self.presentedState[self.currentSub] then
-        self.presentedState[self.currentSub].sender = true
-        self.presentedState[self.currentSub].recipient = true
+    elseif scancode == "1" and self.presentedState[rc] then
+        self.presentedState[rc].recipient = true
+    elseif scancode == "2" and self.presentedState[rc] then
+        self.presentedState[rc].sender = true
+    elseif scancode == "3" and self.presentedState[rc] then
+        self.presentedState[rc].sender = true
+        self.presentedState[rc].recipient = true
     elseif key == "left" then
         self:prev()
         self:updateImageViewer()
@@ -201,11 +210,13 @@ function Presenter:keypressed(key, scancode, isrepeat)
 end
 
 function Presenter:update(dt)
-    self.bg.offsetX = self.bg.offsetX - 48 * dt
-    self.bg.offsetY = self.bg.offsetY + 24 * dt
+    -- if self.theme.spec.bgMode ~= "fill" then
+    --     self.bg.offsetX = self.bg.offsetX - 48 * dt
+    --     self.bg.offsetY = self.bg.offsetY + 24 * dt
 
-    self.bg.offsetX = math.fmod(self.bg.offsetX, self.bg.canvas:getWidth())
-    self.bg.offsetY = math.fmod(self.bg.offsetY, self.bg.canvas:getHeight())
+    --     self.bg.offsetX = math.fmod(self.bg.offsetX, self.bg.canvas:getWidth())
+    --     self.bg.offsetY = math.fmod(self.bg.offsetY, self.bg.canvas:getHeight())
+    -- end
 end
 
 function Presenter:draw()
@@ -215,9 +226,10 @@ function Presenter:draw()
     self.layout:draw()
 
     -- Draw sender and recipient
-    if self.presentedState[self.currentSub] then
+    local rc = self.presentation.submissions[self.currentSub].recipient
+    if self.presentedState[rc] then
         local w, h = love.graphics.getDimensions()
-        if self.presentedState[self.currentSub].recipient then
+        if self.presentedState[rc].recipient then
             love.graphics.setColor(1, 1, 1)
             love.graphics.setFont(senderFontA)
             love.graphics.print("RECIPIENT",
@@ -234,7 +246,7 @@ function Presenter:draw()
                 h - 50 - senderFontB:getHeight()
             )
         end
-        if self.presentedState[self.currentSub].sender then
+        if self.presentedState[rc].sender then
             love.graphics.setColor(1, 1, 1)
             love.graphics.setFont(senderFontA)
             love.graphics.print("SENDER",
@@ -252,19 +264,22 @@ function Presenter:draw()
             )
         end
     end
+
+    self.layout:drawDebugRects()
 end
 
 function Presenter:drawLeftPanel(rect)
     love.graphics.push("all")
-    love.graphics.setColor(0, 0, 0, 0.25)
-    love.graphics.rectangle("fill", rect.x, rect.y, rect.w, rect.h)
+    love.graphics.setColor(0, 0, 0, 1)
+    love.graphics.rectangle("fill", 0, 0, rect.w, rect.h)
     love.graphics.translate(5, 5)
     love.graphics.setScissor(15, 15, rect.w - 10, rect.h - 10)
     love.graphics.setFont(presenterFont)
     love.graphics.setColor(1, 1, 1)
     love.graphics.translate(0,
-        self.scroll * (rect.h - 10 - #self.presentation.participants * presenterFont:getHeight()))
-    for i, rc in ipairs(self.presentation.participants) do
+        self.scroll * (rect.h - 10 - #self.presentation.submissions * presenterFont:getHeight()))
+    for i, sub in ipairs(self.presentation.submissions) do
+        local rc = sub.recipient
         if i == self.currentSub then
             love.graphics.setColor(0.5, 0.5, 1, 0.50)
             love.graphics.rectangle("fill", 0, 0, rect.w - 10, presenterFont:getHeight())
@@ -277,12 +292,26 @@ function Presenter:drawLeftPanel(rect)
         if sp and sp.fancyName ~= "" then
             name = self.theme.spec.participants[name].fancyName
         end
-        if not self.presentedState[i] then
+        if not self.presentedState[rc] then
             love.graphics.setColor(0.5, 0.5, 0.5)
         else
             love.graphics.setColor(1, 1, 1)
         end
         love.graphics.print(name)
+
+        if self.presentedState[rc] and self.presentedState[rc].recipient then
+            love.graphics.setColor(recvColor)
+            love.graphics.circle("fill", rect.w - 40, (presenterFont:getHeight()) / 2, 10)
+        end
+
+        local thisPersonsSub = self.presentation:findSubBySender(rc)
+        if
+            self.presentedState[thisPersonsSub.recipient] and
+            self.presentedState[thisPersonsSub.recipient].sender then
+            love.graphics.setColor(sentColor)
+            love.graphics.circle("fill", rect.w - 60, (presenterFont:getHeight()) / 2, 10)
+        end
+
         love.graphics.translate(0, presenterFont:getHeight())
     end
     love.graphics.pop()

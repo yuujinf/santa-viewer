@@ -11,7 +11,10 @@ love.graphics.setDefaultFilter("nearest", "nearest")
 local state = {
     scene = nil,
 
-    presenter = P:new({ projectName = "santa24", themeName = "defaultTheme" })
+    presenter = P:new({
+        projectName = "santa24",
+        themeName = "defaultTheme2",
+    })
 }
 
 function love.load()

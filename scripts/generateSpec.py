@@ -9,7 +9,9 @@ import json
 
 if __name__ == "__main__":
     project = sys.argv[1]
-    spec = {'participants': {}}
+    spec = {
+        'participants': {},
+        'bgMode': 'fill'}
     if project is None:
         raise Exception("Must provide project directory/name file")
     stat = os.stat(project)
@@ -17,6 +19,8 @@ if __name__ == "__main__":
         for ch in os.listdir(project):
             spec["participants"][ch.split("-")[1]] = {
                 'fancyName': '',
+                'color': 'white',
+                'previousSantas': [],
                 'socials': {
                     'twitter': '',
                     'bluesky': '',

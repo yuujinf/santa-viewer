@@ -31,6 +31,14 @@ function WrappingBackground:initialize()
     self.arrowDst = nil
     self.arrowCur = nil
 
+    if self.mode == "fill" then
+        local sw, sh = love.graphics.getDimensions()
+        self.scaleFactor = math.min(
+            sw / self.image:getWidth(),
+            sh / self.image:getHeight())
+    end
+    self.mode = self.mode or "wrap"
+
     self.shader = love.graphics.newShader([[
         /* for some arcane reason this epsilon is necessary */
         const float EPSILON = 0.001;
@@ -53,8 +61,8 @@ function WrappingBackground:initialize()
         vec4 effect(vec4 color, Image tex, vec2 texture_coords, vec2 screen_coords)
         {
             screen_coords += EPSILON;
-            vec2 uv = (((screen_coords - offset -currentOffset)/zoom - love_ScreenSize.xy/2)/canvasDims);
-            uv = uv-0.5;
+            vec2 uv = (((screen_coords - offset -currentOffset) - love_ScreenSize.xy/2)/canvasDims);
+            uv = (uv/zoom-0.5);
             vec4 texturecolor = Texel(wrapIm, uv);
             vec4 rb = vec4(hsv2rgb(vec3(ceil(20*(uv.x+uv.y-0.15))/20,1,1)),1.0);
             return mix(texturecolor, rb, 0) * color * vec4(tint,tint,tint,1.0);
@@ -64,7 +72,7 @@ function WrappingBackground:initialize()
     self.shader:send("canvasDims", { self.canvas:getDimensions() })
     self.shader:send("offset", { 0, 0 })
     self.shader:send("currentOffset", { 0, 0 })
-    self.shader:send("zoom", 1)
+    self.shader:send("zoom", self.scaleFactor)
     self.shader:send("tint", 0.5)
 end
 
@@ -160,7 +168,7 @@ function WrappingBackground:draw()
     love.graphics.setColor(1, 1, 1)
     love.graphics.setLineWidth(1)
     love.graphics.draw(self.image, 0, 0)
-    -- love.graphics.rectangle("line", 0, 0, self.canvas:getDimensions())
+    love.graphics.rectangle("line", 0, 0, self.canvas:getDimensions())
     if self.arrowSrc then
         for dx = -1, 1 do
             for dy = -1, 1 do

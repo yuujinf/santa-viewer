@@ -4,8 +4,8 @@ function love.conf(t)
 
     t.identity = "SantaViewer"
 
-    t.window.width = 1600
-    t.window.height = 960
+    t.window.width = 1920
+    t.window.height = 1080
     t.window.minwidth = 800
     t.window.minheight = 600
 end
