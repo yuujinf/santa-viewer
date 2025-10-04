@@ -27,6 +27,8 @@ function ImageViewer:initialize()
 
     self.scaleLevel = 0
     self.scaleFactor = 1
+
+    self.hide = false
 end
 
 function ImageViewer:setImage(filename)
@@ -63,10 +65,15 @@ function ImageViewer:draw()
     love.graphics.translate(math.floor(-self.image:getWidth() / 2), math.floor(-self.image:getHeight() / 2))
 
     -- Draw background rectangle
-    love.graphics.setColor(1, 1, 1)
-    love.graphics.rectangle("fill", -10, -10, self.image:getWidth() + 20, self.image:getHeight() + 20)
-    love.graphics.setColor(1, 1, 1)
-    love.graphics.draw(self.image, 0, 0)
+    -- love.graphics.setColor(1, 1, 1)
+    -- love.graphics.rectangle("fill", -10, -10, self.image:getWidth() + 20, self.image:getHeight() + 20)
+    if self.hide then
+        love.graphics.setColor(1, 0, 0)
+        love.graphics.rectangle("fill", 0, 0, self.image:getDimensions())
+    else
+        love.graphics.setColor(1, 1, 1)
+        love.graphics.draw(self.image, 0, 0)
+    end
     love.graphics.pop()
 end
 
