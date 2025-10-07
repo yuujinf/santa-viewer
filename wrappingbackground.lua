@@ -62,7 +62,7 @@ function WrappingBackground:initialize()
         {
             screen_coords += EPSILON;
             vec2 uv = (((screen_coords - offset -currentOffset) - love_ScreenSize.xy/2)/canvasDims);
-            uv = (uv/zoom-0.5);
+            uv = (uv/zoom+0.5);
             vec4 texturecolor = Texel(wrapIm, uv);
             vec4 rb = vec4(hsv2rgb(vec3(ceil(20*(uv.x+uv.y-0.15))/20,1,1)),1.0);
             return mix(texturecolor, rb, 0) * color * vec4(tint,tint,tint,1.0);
@@ -168,7 +168,7 @@ function WrappingBackground:draw()
     love.graphics.setColor(1, 1, 1)
     love.graphics.setLineWidth(1)
     love.graphics.draw(self.image, 0, 0)
-    love.graphics.rectangle("line", 0, 0, self.canvas:getDimensions())
+    -- love.graphics.rectangle("line", 0, 0, self.canvas:getDimensions())
     if self.arrowSrc then
         for dx = -1, 1 do
             for dy = -1, 1 do
@@ -193,6 +193,18 @@ function WrappingBackground:draw()
     love.graphics.setShader(self.shader)
     love.graphics.rectangle("fill", 0, 0, love.graphics.getDimensions())
     love.graphics.setShader()
+end
+
+function WrappingBackground:setTint(tint)
+    self.shader:send("tint", tint)
+end
+
+function WrappingBackground:setWrap(wrap)
+    if wrap then
+        self.canvas:setWrap("repeat", "repeat", "repeat")
+    else
+        self.canvas:setWrap("clamp", "clamp", "clamp")
+    end
 end
 
 return WrappingBackground

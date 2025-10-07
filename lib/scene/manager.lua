@@ -28,7 +28,6 @@ function SceneManager:setScene(s, params)
     end
 
     local p = params or {}
-    print("params", p, p.projectName)
     s:initialize(p)
     self.scene = s
 end

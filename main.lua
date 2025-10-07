@@ -3,6 +3,7 @@ local Scene = require("lib.scene")
 
 local Menu = require("menu")
 local PresenterScene = require("presenterscene")
+local ThemeEditorScene = require("themeeditor")
 
 love.graphics.setDefaultFilter("nearest", "nearest")
 
@@ -15,6 +16,10 @@ function love.load()
 
     state.scene:addHandler("toPresent", function(h, params)
         h:setScene(PresenterScene, params)
+    end)
+
+    state.scene:addHandler("toThemeEditor", function(h, params)
+        h:setScene(ThemeEditorScene, params)
     end)
 end
 

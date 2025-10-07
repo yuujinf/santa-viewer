@@ -20,6 +20,7 @@ function Theme:loadTheme(name)
 
     self.avatars = {}
     self.bg = love.graphics.newImage(path .. "/" .. "bg.png") or nil
+    self.main = love.graphics.newImage(path .. "/" .. "participants.png") or nil
 
     local avDir = love.filesystem.getDirectoryItems(path .. "/" .. "avatars")
     for _, a in ipairs(avDir) do
@@ -33,7 +34,22 @@ function Theme:loadTheme(name)
 
     local data = love.filesystem.read(path .. "/" .. "spec.json")
     self.spec = json.decode(data)
+
+    for k, v in pairs(self.spec.participants) do
+        v.xPos = v.xPos or 0
+        v.yPos = v.yPos or 0
+        v.radius = v.radius or 10
+        v.fancyName = v.fancyName or ""
+    end
+
     print(self.spec.bgMode)
+end
+
+function Theme:save(destination)
+    local path = "themes/" .. destination .. "/spec.json"
+    print("saving to", path)
+    local data = json.encode(self.spec)
+    print(data)
 end
 
 function Theme.load(name)

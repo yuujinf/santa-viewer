@@ -39,6 +39,10 @@ function Menu:rebuildLayout()
         })
         builder:with(Layout.newButton {
             label = "Edit Theme",
+            onClick = function()
+                self.sendEvent("toThemeEditor", {
+                })
+            end
         })
     end)
     self.layout:rebuildLayout()
