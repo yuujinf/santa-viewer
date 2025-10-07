@@ -25,6 +25,12 @@ function Menu:rebuildLayout()
         })
         builder:with(Layout.newButton {
             label = "Official Presentation",
+            onClick = function()
+                self.sendEvent("toPresent", {
+                    projectName = "santa24",
+                    themeName = "defaultTheme2",
+                })
+            end
         })
         builder:with(Layout.newButton {
             label = "Test Presentation",

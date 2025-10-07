@@ -1,77 +1,47 @@
 local Layout = require("lib.layout")
 local Scene = require("lib.scene")
-local Menu = require("menu")
 
-local WB = require("wrappingbackground")
-local IV = require("imageviewer")
-local P = require("presenter")
+local Menu = require("menu")
+local PresenterScene = require("presenterscene")
 
 love.graphics.setDefaultFilter("nearest", "nearest")
 
 local state = {
     scene = nil,
-
-    presenter = P:new({
-        projectName = "santa24",
-        themeName = "defaultTheme2",
-    })
 }
 
 function love.load()
     state.scene = Scene.newManager(Menu, {})
-    state:rebuildLayout()
-end
 
-function state:rebuildLayout()
-    self.screenW, self.screenH = love.graphics.getDimensions()
-    local b = Layout.newBuilder()
-    self.layout = b:with(Layout.newItem {
-            sizing = Layout.rectSizing(self.screenW, self.screenH),
-            padding = Layout.padding(10),
-            childGap = 10,
-        },
-        function()
-            -- self.viewer:rebuildLayout(b)
-        end)
-
-    self.layout:rebuildLayout()
+    state.scene:addHandler("toPresent", function(h, params)
+        h:setScene(PresenterScene, params)
+    end)
 end
 
 function love.mousemoved(x, y, dx, dy, istouch)
-    -- state.scene:mousemoved(x, y, dx, dy, istouch)
-    -- state.bg:mousemoved(x, y, dx, dy, istouch)
-    state.presenter:mousemoved(x, y, dx, dy, istouch)
+    state.scene:mousemoved(x, y, dx, dy, istouch)
 end
 
 function love.mousepressed(x, y, button, istouch, presses)
-    -- state.scene:mousepressed(x, y, button, istouch, presses)
-    -- state.bg:mousepressed(x, y, button, istouch, presses)
-    state.presenter:mousepressed(x, y, button, istouch, presses)
+    state.scene:mousepressed(x, y, button, istouch, presses)
 end
 
 function love.mousereleased(x, y, button, istouch, presses)
-    -- state.scene:mousereleased(x, y, button, istouch, presses)
-    -- state.bg:mousereleased(x, y, button, istouch, presses)
-    state.presenter:mousereleased(x, y, button, istouch, presses)
+    state.scene:mousereleased(x, y, button, istouch, presses)
 end
 
 function love.keypressed(key, scancode, isrepeat)
-    -- state.scene:keypressed(key, scancode, isrepeat)
-    -- state.bg:keypressed(key, scancode, isrepeat)
-    state.presenter:keypressed(key, scancode, isrepeat)
+    state.scene:keypressed(key, scancode, isrepeat)
 end
 
 function love.wheelmoved(dx, dy)
-    -- state.bg:wheelmoved(dx, dy)
-    state.presenter:wheelmoved(dx, dy)
+    state.scene:wheelmoved(dx, dy)
 end
 
 function love.update(dt)
-    -- state.scene:update(dt)
-
-    state.presenter:update(dt)
+    state.scene:update(dt)
 end
 
 function love.draw()
-    state.presenter:draw()
+    state.scene:draw()
 end
