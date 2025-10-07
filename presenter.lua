@@ -206,6 +206,18 @@ function Presenter:keypressed(key, scancode, isrepeat)
         self.imageViewer:zoomToFit()
     elseif key == "tab" then
         self.leftPanelVisible = not self.leftPanelVisible
+    elseif scancode == "a" and self.presentedState[rc] and self.presentedState[rc].recipient then
+        -- Jump to the recipient's gift
+        local sub = self.presentation.submissions[self.currentSub]
+        self:setSubmission(self.presentation:findSubIndexBySender(sub.recipient))
+        self.currentItem = 1
+        self:updateImageViewer()
+    elseif scancode == "d" and self.presentedState[rc] and self.presentedState[rc].sender then
+        -- Jump to the sender's gift
+        local sub = self.presentation.submissions[self.currentSub]
+        self:setSubmission(self.presentation:findSubIndexByRecipient(sub.sender))
+        self.currentItem = 1
+        self:updateImageViewer()
     end
 end
 

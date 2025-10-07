@@ -57,8 +57,8 @@ function Presentation:loadPresentation(pn)
         print(string.format("%s > %s", sub.sender or "NIL", sub.recipient))
         table.insert(self.submissions, sub)
         table.insert(self.participants, sub.recipient)
-        self.sendMap[sub.sender] = sub
-        self.recvMap[sub.recipient] = sub
+        self.sendMap[sub.sender] = i
+        self.recvMap[sub.recipient] = i
     end
 end
 
@@ -79,10 +79,18 @@ function Presentation:numberOfItems(subIdx)
 end
 
 function Presentation:findSubBySender(sender)
-    return self.sendMap[sender]
+    return self.submissions[self.sendMap[sender]]
 end
 
 function Presentation:findSubByRecipient(recv)
+    return self.submissions[self.recvMap[recv]]
+end
+
+function Presentation:findSubIndexBySender(sender)
+    return self.sendMap[sender]
+end
+
+function Presentation:findSubIndexByRecipient(recv)
     return self.recvMap[recv]
 end
 
