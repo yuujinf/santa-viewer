@@ -1,4 +1,5 @@
 local LayoutBuilder = {}
+local LayoutItem = require("lib.layout.layoutitem")
 
 function LayoutBuilder:new()
     local o = {}
@@ -34,6 +35,10 @@ function LayoutBuilder:with(item, body)
     self:push(item)
     body()
     return self:pop()
+end
+
+function LayoutBuilder:withItem(spec, body)
+    return self:with(LayoutItem:new(spec), body)
 end
 
 return LayoutBuilder
