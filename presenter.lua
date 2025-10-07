@@ -177,10 +177,20 @@ function Presenter:keypressed(key, scancode, isrepeat)
             self.presentedState[rc] = {
                 image = true,
             }
+        elseif
+            self.currentItem == self.presentation:numberOfItems(self.currentSub) and
+            not self.presentedState[rc].recipient
+        then
+            self.presentedState[rc].recipient = true
+        elseif
+            self.currentItem == self.presentation:numberOfItems(self.currentSub) and
+            not self.presentedState[rc].sender
+        then
+            self.presentedState[rc].sender = true
         else
             self:next()
+            self:updateImageViewer()
         end
-        self:updateImageViewer()
     elseif key == "space" then
         self.imageViewer.hide = false
         if not self.presentedState[rc] then
